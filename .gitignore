@@ -1,0 +1,21 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtualenv
+.venv/
+env/
+venv/
+
+# Django
+db.sqlite3
+*.log
+media/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
