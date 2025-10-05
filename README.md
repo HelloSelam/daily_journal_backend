@@ -30,6 +30,7 @@ This project is part of the ALX Backend Capstone Project and focuses on building
 ---
 
 ## Project Structure
+```
 daily_journal_backend/
 ├── daily_journal_project/   # Django project settings
 ├── journal/                 # main app (models, views, serializers)
@@ -37,3 +38,4 @@ daily_journal_backend/
 ├── .venv/                   # virtualenv (not committed)
 ├── .gitignore
 └── README.md
+```
