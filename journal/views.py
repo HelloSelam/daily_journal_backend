@@ -3,6 +3,7 @@ from .models import JournalEntry
 from .serializers import JournalEntrySerializer
 from django.shortcuts import render
 from django.http import HttpResponse
+from rest_framework.authtoken.views import obtain_auth_token
 
 def home(request):
     return HttpResponse("Welcome to the Daily Journal App!")
