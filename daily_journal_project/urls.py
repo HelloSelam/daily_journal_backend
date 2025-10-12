@@ -8,4 +8,6 @@ urlpatterns = [
     path('api/', include('journal.api_urls')),     # for API endpoints
     path('auth/', include('journal.auth_urls')),   # for authentication routes
     path('api/auth/', views.obtain_auth_token),    # login endpoint 
+    path('api/auth/', include('dj_rest_auth.urls')),              # login/logout
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),  # signup
 ]
