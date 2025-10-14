@@ -10,18 +10,19 @@
   <div class="container">
     <h1>Daily Journal App</h1>
 
+    <!-- AUTH SECTION -->
     <div id="auth-section">
-        <!-- LOGIN FORM -->
-        <div id="login-form">
+      <!-- LOGIN FORM -->
+      <div id="login-form">
         <h2>Login</h2>
         <input type="text" id="username" placeholder="Username" />
         <input type="password" id="password" placeholder="Password" />
         <button id="login-btn">Login</button>
         <p>Don't have an account? <a href="#" id="show-register">Sign up</a></p>
-        </div>
+      </div>
 
-        <!-- REGISTER FORM -->
-        <div id="register-form" class="hidden">
+      <!-- REGISTER FORM -->
+      <div id="register-form" class="hidden">
         <h2>Sign Up</h2>
         <input type="text" id="reg-username" placeholder="Username" />
         <input type="email" id="reg-email" placeholder="Email" />
@@ -29,19 +30,23 @@
         <input type="password" id="reg-password2" placeholder="Confirm Password" />
         <button id="register-btn">Sign Up</button>
         <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-        </div>
-    
+      </div>
     </div>
 
+    <!-- JOURNAL SECTION -->
     <div id="journal-section" class="hidden">
+      <div class="journal-header">
         <h2>My Journal Entries</h2>
-        <div id="entries"></div>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+      </div>
 
-        <h3>Add New Entry</h3>
-        <input type="text" id="title" placeholder="Title" />
-        <textarea id="content" placeholder="Write your journal..."></textarea>
-        <input type="text" id="mood" placeholder="Mood (optional)" />
-        <button id="add-entry-btn">Add Entry</button>
+      <div id="entries"></div>
+
+      <h3>Add New Entry</h3>
+      <input type="text" id="title" placeholder="Title" />
+      <textarea id="content" placeholder="Write your journal..."></textarea>
+      <input type="text" id="mood" placeholder="Mood (optional)" />
+      <button id="add-entry-btn">Add Entry</button>
     </div>
   </div>
 

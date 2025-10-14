@@ -1,9 +1,8 @@
 // frontend/script.js
-const baseURL = "http://127.0.0.1:8000/api"; // backend API base
-let token = localStorage.getItem("token") || "";
+const baseURL = "http://127.0.0.1:8000/api"; // Django API base
+let token = "";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Elements
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const showRegister = document.getElementById("show-register");
@@ -18,7 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Toggle between login and signup
+  // Check for saved token (persist login)
+  const savedToken = localStorage.getItem("authToken");
+  if (savedToken) {
+    token = savedToken;
+    document.getElementById("auth-section").classList.add("hidden");
+    document.getElementById("journal-section").classList.remove("hidden");
+    loadEntries();
+  }
+
+  // Toggle views
   showRegister?.addEventListener("click", (e) => {
     e.preventDefault();
     loginForm.classList.add("hidden");
@@ -31,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.classList.remove("hidden");
   });
 
-  // Helper to parse fetch responses
   async function parseResponse(res) {
     const text = await res.text();
     try {
@@ -41,49 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Show journal page
-  function showJournalPage() {
-    if (!token) return; // Not logged in
-    document.getElementById("auth-section").classList.add("hidden");
-    document.getElementById("journal-section").classList.remove("hidden");
-    loadEntries();
-  }
-
-  // LOGIN
-  loginBtn?.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!username || !password) {
-      alert("Please enter username and password.");
-      return;
-    }
-
-    try {
-      const res = await fetch(`${baseURL}/auth/login/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await parseResponse(res);
-      console.log("Login response:", res.status, data);
-
-      if (res.ok && (data.key || data.token)) {
-        token = data.key || data.token;
-        localStorage.setItem("token", token); // Store token
-        showJournalPage();
-      } else {
-        alert("Login failed: " + JSON.stringify(data));
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("Network or server error during login. See console for details.");
-    }
-  });
-
-  // REGISTER
+  // Register
   registerBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
     const username = document.getElementById("reg-username").value.trim();
@@ -108,55 +73,115 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await parseResponse(res);
-      console.log("Registration response:", res.status, data);
-
       if (res.ok) {
-        alert("Registration successful! Please log in.");
+        alert("Registration successful! Please login with your credentials.");
         registerForm.classList.add("hidden");
         loginForm.classList.remove("hidden");
-        document.getElementById("username").value = username; // prefill username
+        document.getElementById("username").value = username;
       } else {
         alert("Registration failed: " + JSON.stringify(data));
       }
     } catch (err) {
       console.error("Registration error:", err);
-      alert("Network or server error during registration. See console for details.");
+      alert("Network or server error during registration.");
+    }
+  });
+
+  // Login
+  loginBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Please enter username and password.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${baseURL}/auth/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await parseResponse(res);
+      if (res.ok && (data.key || data.token)) {
+        token = data.key || data.token;
+        localStorage.setItem("authToken", token);
+        document.getElementById("auth-section").classList.add("hidden");
+        document.getElementById("journal-section").classList.remove("hidden");
+        loadEntries();
+      } else {
+        alert("Login failed: " + JSON.stringify(data));
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Network or server error during login.");
     }
   });
 
   // Logout
-  document.getElementById("logout-btn")?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    token = "";
-    location.reload();
-  });
+    const logoutBtn = document.getElementById("logout-btn");
+    logoutBtn?.addEventListener("click", (e) => {
+       e.preventDefault();
+        const confirmLogout = confirm("Are you sure you want to log out?");
+        if (!confirmLogout) return;
 
-  // Load journal entries
+        // Clear stored token
+        token = "";
+        localStorage.removeItem("authToken");
+
+        // Hide journal section, show login again
+        document.getElementById("journal-section").classList.add("hidden");
+        document.getElementById("auth-section").classList.remove("hidden");
+
+        // Optional: clear form fields
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+
+        alert("You have logged out successfully.");
+    }); 
+    
+  // Load entries
   async function loadEntries() {
     try {
       const res = await fetch(`${baseURL}/entries/`, {
         headers: { Authorization: `Token ${token}` },
       });
       const data = await parseResponse(res);
-      console.log("Load entries response:", res.status, data);
 
       if (res.ok) {
+        if (data.length === 0) {
+          entriesDiv.innerHTML = "<p>No journal entries yet.</p>";
+          return;
+        }
+
         entriesDiv.innerHTML = data
-          .map((entry) => {
-            const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : "";
-            return `<div class="entry">
-                      <h4>${escapeHtml(entry.title)}</h4>
-                      <p>${escapeHtml(entry.content)}</p>
-                      <small>Mood: ${escapeHtml(entry.mood || "N/A")} | Date: ${date}</small>
-                    </div>`;
-          })
+          .map(
+            (entry) => `
+              <div class="entry">
+                <h4 class="entry-title" data-id="${entry.id}">
+                  ${escapeHtml(entry.title)}
+                </h4>
+                <div class="entry-content hidden" id="entry-${entry.id}">
+                  <p>${escapeHtml(entry.content)}</p>
+                  <small>Mood: ${escapeHtml(entry.mood || "N/A")}</small><br>
+                  <small>Date: ${new Date(entry.created_at).toLocaleString()}</small><br>
+                  <button class="delete-btn" data-id="${entry.id}">Delete</button>
+                </div>
+              </div>
+            `
+          )
           .join("");
+
+        attachEntryListeners();
       } else {
         alert("Failed to load entries: " + JSON.stringify(data));
       }
     } catch (err) {
       console.error("Load entries error:", err);
-      alert("Network or server error when loading entries. See console.");
+      alert("Network or server error when loading entries.");
     }
   }
 
@@ -183,8 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await parseResponse(res);
-      console.log("Create entry response:", res.status, data);
-
       if (res.ok) {
         document.getElementById("title").value = "";
         document.getElementById("content").value = "";
@@ -195,18 +218,50 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error("Add entry error:", err);
-      alert("Network or server error when adding entry. See console.");
+      alert("Network or server error when adding entry.");
     }
   });
 
-  // Escape HTML helper
+  // Attach listeners for toggling and deleting
+  function attachEntryListeners() {
+    document.querySelectorAll(".entry-title").forEach((titleEl) => {
+      titleEl.addEventListener("click", () => {
+        const id = titleEl.dataset.id;
+        const contentDiv = document.getElementById(`entry-${id}`);
+        contentDiv.classList.toggle("hidden");
+      });
+    });
+
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const confirmDel = confirm("Are you sure you want to delete this entry?");
+        if (!confirmDel) return;
+
+        try {
+          const res = await fetch(`${baseURL}/entries/${id}/`, {
+            method: "DELETE",
+            headers: { Authorization: `Token ${token}` },
+          });
+
+          if (res.status === 204) {
+            alert("Entry deleted successfully.");
+            loadEntries();
+          } else {
+            const data = await parseResponse(res);
+            alert("Failed to delete: " + JSON.stringify(data));
+          }
+        } catch (err) {
+          console.error("Delete error:", err);
+          alert("Network or server error during delete.");
+        }
+      });
+    });
+  }
+
   function escapeHtml(text) {
     if (!text) return "";
     return text.replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
-  }
-
-  // Show journal page if already logged in
-  if (token) {
-    showJournalPage();
   }
 });
