@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Journal App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Daily Journal App</h1>
+
+    <div id="auth-section">
+        <!-- LOGIN FORM -->
+        <div id="login-form">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button id="login-btn">Login</button>
+        <p>Don't have an account? <a href="#" id="show-register">Sign up</a></p>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-form" class="hidden">
+        <h2>Sign Up</h2>
+        <input type="text" id="reg-username" placeholder="Username" />
+        <input type="email" id="reg-email" placeholder="Email" />
+        <input type="password" id="reg-password1" placeholder="Password" />
+        <input type="password" id="reg-password2" placeholder="Confirm Password" />
+        <button id="register-btn">Sign Up</button>
+        <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+    
+    </div>
+
+    <div id="journal-section" class="hidden">
+        <h2>My Journal Entries</h2>
+        <div id="entries"></div>
+
+        <h3>Add New Entry</h3>
+        <input type="text" id="title" placeholder="Title" />
+        <textarea id="content" placeholder="Write your journal..."></textarea>
+        <input type="text" id="mood" placeholder="Mood (optional)" />
+        <button id="add-entry-btn">Add Entry</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
