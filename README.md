@@ -8,10 +8,10 @@ It allows users to **register, log in, and manage personal journal entries** sec
 ## 🚀 Features
 
 - 🔐 **User Authentication**  
-  Users can register, log in, and log out securely using token-based authentication.
+  - Users can register, log in, and log out securely using token-based authentication.
 
 - 📓 **Journal Management (CRUD)**  
-  Create, view, and delete journal entries.
+  - Create, view, and delete journal entries.
 
 - ✨ **User-Friendly Interface**  
   - Only entry titles are listed.  
@@ -19,7 +19,7 @@ It allows users to **register, log in, and manage personal journal entries** sec
   - Entries can be deleted easily.  
 
 - 🔁 **Dynamic Frontend Integration**  
-  The frontend interacts with the backend API in real time using JavaScript `fetch()`.
+  - The frontend interacts with the backend API in real time using JavaScript `fetch()`.
 
 ---
 
@@ -49,13 +49,13 @@ cd daily_journal_backend
 
 ### 2️⃣ Set Up a Virtual Environment
 
-**On Windows**
-- python -m venv venv
-- venv\Scripts\activate
+- **On Windows**
+    - python -m venv venv
+    - venv\Scripts\activate
 
 
-**On Mac/Linux**
-- source venv/bin/activate
+- **On Mac/Linux**
+    - source venv/bin/activate
 
 ### 3️⃣ Install Dependencies
 - pip install -r requirements.txt
@@ -69,14 +69,17 @@ DATABASE_URL=sqlite:///db.sqlite3
 ```
 
 ### 5️⃣ Run Migrations
-- python manage.py migrate
+``` python manage.py migrate ```
 
 ### 6️⃣ Start the Development Server
 
-- python manage.py runserver
+``` python manage.py runserver ```
+
 - Backend will run on:
 
-    ``` 👉 http://127.0.0.1:8000/ ```
+    ```
+    http://127.0.0.1:8000/ 
+    ```
 
 ### 7️⃣ Open the Frontend
 - Open frontend/index.html using Live Server (e.g., in VS Code) or any local web server.
@@ -84,7 +87,7 @@ DATABASE_URL=sqlite:///db.sqlite3
 
 ---
 
-### 🔗 API Endpoints
+## 🔗 API Endpoints
 
 | Endpoint                  | Method    | Description                         |
 | ------------------------- | --------- | ----------------------------------- |
@@ -96,7 +99,7 @@ DATABASE_URL=sqlite:///db.sqlite3
 
 ---
 
-### 🧩 Folder Structure
+## 🧩 Folder Structure
 ```
 daily_journal_project/
 │
@@ -120,19 +123,19 @@ requirements.txt
 
 ---
 
-### 🌍 Deployment (for later)
-**Backend (Render or Railway)**
+## 🌍 Deployment (for later)
+- **Backend (Render or Railway)**
     - ush your project to GitHub.
     - Connect your repo to Render or Railway
     - Add your .env variables in the deployment dashboard.
     - Deploy — your API will be live!
 
-**Frontend (Netlify or GitHub Pages)**
+- **Frontend (Netlify or GitHub Pages)**
     - Upload your frontend folder to Netlify
     or host via GitHub Pages.
     - Update baseURL in frontend/script.js to point to your deployed backend API.
 
-### 🔜 Upcoming Improvements
+## 🔜 Upcoming Improvements
 - ✏️ Edit/Update existing entries
 - 🔍 Search entries by title or mood
 - 🌙 Dark mode toggle
@@ -140,9 +143,9 @@ requirements.txt
 
 ---
 
-### 👩‍💻 Author
+## 👩‍💻 Author
 
-**Selamawit Yeruk**
+## Selamawit Yeruk
 
 Built as part of the ALX Back-End Development Capstone Project.
 💻 Passionate about web development, learning Django & API integration.
