@@ -66,6 +66,7 @@ cd daily_journal_backend
 SECRET_KEY=your_secret_key
 DEBUG=True
 DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
 ### 5️⃣ Run Migrations
@@ -83,7 +84,7 @@ DATABASE_URL=sqlite:///db.sqlite3
 
 ### 7️⃣ Open the Frontend
 - Open frontend/index.html using Live Server (e.g., in VS Code) or any local web server.
-- The frontend connects to your backend API (set to http://127.0.0.1:8000/api/).
+- The frontend connects to backend API (set to http://127.0.0.1:8000/api/).
 
 ---
 
@@ -98,6 +99,131 @@ DATABASE_URL=sqlite:///db.sqlite3
 | `/api/entries/<id>/`      | DELETE    | Delete an entry                     |
 
 ---
+
+# 🧪 Testing the API Endpoints
+
+This section guides you through testing the Journal API endpoints locally.
+
+## 🧍 Register a New User
+
+- Endpoint: POST /api/auth/register/
+  
+  ```
+  Example request (JSON):
+  {
+    "username": "testuser",
+    "email": "testuser@example.com",
+    "password1": "StrongPass123",
+    "password2": "StrongPass123"
+  }
+  
+  Expected response:
+
+  {
+    "Regusteration successfull! Please login."
+  }
+
+  ```
+
+## 🔑 Login
+
+- Endpoint: POST /api/auth/login/
+
+  ```
+  Example request (JSON):
+
+  {
+    "username": "testuser",
+    "password": "StrongPass123"
+  }
+
+
+  Expected response:
+
+  {
+    "key": "5a7f90b8a48c19b72cd941f4ff7fbcf9d894e9b2"
+  }
+  ```
+
+## 📓 CRUD Journal Entries
+- Use the token from the login or registration response in your headers:
+
+```
+Authorization: Token 5a7f90b8a48c19b72cd941f4ff7fbcf9d894e9b2
+```
+
+## ➕ Create a Journal Entry
+- Endpoint: POST /api/entries/
+
+  ```
+  Example request (JSON):
+
+  {
+  "title": "My first journal entry",
+  "content": "Testing API with token auth",
+  "mood": "Excited"
+  }
+
+  Expected response:
+
+  {
+    "id": 1,
+    "title": "My first journal entry",
+    "content": "Testing API with token auth",
+    "mood": "Excited",
+    "created_at": "2025-10-17T11:25:43.892Z",
+    "updated_at": "2025-10-17T11:25:43.892Z",
+    "owner": 1
+  }
+  
+  Another Example Entry 
+
+  {
+    "title": "Grateful Day",
+    "content": "Today I felt very productive and calm.",
+    "mood": "Happy"
+  }
+
+
+  Expected response:
+
+  {
+    "id": 2,
+    "title": "Grateful Day",
+    "content": "Today I felt very productive and calm.",
+    "mood": "Happy",
+    "created_at": "2025-10-17T11:25:43.892Z",
+    "updated_at": "2025-10-17T11:25:43.892Z",
+    "owner": 1
+  }
+  
+  ```
+ 
+
+## 👀 View All Journal Entries
+- Endpoint: GET /api/entries/
+  ```
+  Expected response:
+
+  [
+    {
+      "id": 1,
+      "title": "Grateful Day",
+      "content": "Today I felt very productive and calm.",
+      "mood": "Happy",
+      "created_at": "2025-10-17T11:25:43.892Z",
+      "updated_at": "2025-10-17T11:25:43.892Z",
+      "owner": 1
+    }
+  ]
+  ```
+
+## 🗑️ Delete a Journal Entry
+- Endpoint: DELETE /api/entries/1/
+  ```
+  Expected response:
+  Status 204 No Content on success.
+  ```
 
 ## 🧩 Folder Structure
 ```
@@ -123,18 +249,6 @@ requirements.txt
 
 ---
 
-## 🌍 Deployment (for later)
-- **Backend (Render or Railway)**
-    - ush your project to GitHub.
-    - Connect your repo to Render or Railway
-    - Add your .env variables in the deployment dashboard.
-    - Deploy — your API will be live!
-
-- **Frontend (Netlify or GitHub Pages)**
-    - Upload your frontend folder to Netlify
-    or host via GitHub Pages.
-    - Update baseURL in frontend/script.js to point to your deployed backend API.
-
 ## 🔜 Upcoming Improvements
 - ✏️ Edit/Update existing entries
 - 🔍 Search entries by title or mood
@@ -151,8 +265,3 @@ Built as part of the ALX Back-End Development Capstone Project.
 💻 Passionate about web development, learning Django & API integration.
 
 ---
-
-### 🌐 Deployed Demo (Coming Soon)
-
-- 🔗 Backend API: https://backend-url.onrender.com/api/
-- 🔗 Frontend (Live App): https://frontend-url.netlify.app/
