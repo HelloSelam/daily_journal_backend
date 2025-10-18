@@ -1,26 +1,59 @@
+import os
 from pathlib import Path
+import sys
 from decouple import config
 import dj_database_url
-import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------------------
+# Base directory
+# ---------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ---------------------------
+# Static files
+# ---------------------------
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+os.makedirs(STATIC_ROOT, exist_ok=True)  # prevents collectstatic errors
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# ---------------------------
+# Temporary SQLite for collectstatic
+# ---------------------------
+if 'collectstatic' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
+    # Use PostgreSQL from environment variable
+    DATABASE_URL = config("DATABASE_URL", default=None)
+    if DATABASE_URL:
+        DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+    else:
+        # Fallback for Fly unmanaged Postgres (if DATABASE_URL not set)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.environ.get('PGDATABASE', ''),
+                'USER': os.environ.get('PGUSER', ''),
+                'PASSWORD': os.environ.get('PGPASSWORD', ''),
+                'HOST': os.environ.get('PGHOST', ''),
+                'PORT': os.environ.get('PGPORT', ''),
+            }
+        }
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+# ---------------------------
+# Security
+# ---------------------------
+SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,.fly.dev").split(",")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-
-# Application definition
-
+# ---------------------------
+# Installed Apps
+# ---------------------------
 INSTALLED_APPS = [
     'corsheaders',
     'django.contrib.admin',
@@ -32,18 +65,22 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'dj_rest_auth.registration',
-    'allauth',                     # Required by dj-rest-auth registration
-    'allauth.account',             # Required
-    'allauth.socialaccount',      
     'journal',
 ]
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',  # Required
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# ---------------------------
+# Middleware
+# ---------------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -51,7 +88,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -76,84 +113,53 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'daily_journal_project.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'))
-}
-
-
+# ---------------------------
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+# ---------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
+# ---------------------------
+# Localization
+# ---------------------------
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# ---------------------------
+# Django REST Framework
+# ---------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],
 }
 
 SITE_ID = 1
-
 REST_USE_TOKENS = True
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer',
 }
 
+# ---------------------------
+# CORS & CSRF
+# ---------------------------
 CORS_ALLOW_ALL_ORIGINS = True
-
+CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
     "http://127.0.0.1:8000",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://*.fly.dev",
 ]
 
-# This helps when testing via Postman
-CORS_ALLOW_CREDENTIALS = True
-
-# Immediately return token on registration
-REST_USE_JWT = False  # imple TokenAuthentication
-ACCOUNT_EMAIL_VERIFICATION = "none"  # disables email verification for demo
+# ---------------------------
+# Email / Account Settings
+# ---------------------------
+REST_USE_JWT = False
+ACCOUNT_EMAIL_VERIFICATION = "none"
