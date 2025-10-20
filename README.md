@@ -120,7 +120,7 @@ This section guides you through testing the Journal API endpoints locally.
   Expected response:
 
   {
-    "Regusteration successfull! Please login."
+    "Registration successfull! Please login."
   }
 
   ```

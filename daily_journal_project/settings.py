@@ -17,39 +17,19 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 os.makedirs(STATIC_ROOT, exist_ok=True)  # prevents collectstatic errors
 
 # ---------------------------
-# Temporary SQLite for collectstatic
+# Database
 # ---------------------------
-if 'collectstatic' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    # Use PostgreSQL from environment variable
-    DATABASE_URL = config("DATABASE_URL", default=None)
-    if DATABASE_URL:
-        DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
-    else:
-        # Fallback for Fly unmanaged Postgres (if DATABASE_URL not set)
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': os.environ.get('PGDATABASE', ''),
-                'USER': os.environ.get('PGUSER', ''),
-                'PASSWORD': os.environ.get('PGPASSWORD', ''),
-                'HOST': os.environ.get('PGHOST', ''),
-                'PORT': os.environ.get('PGPORT', ''),
-            }
-        }
+DATABASE_URL = config("DATABASE_URL", default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}")
+DATABASES = {
+    'default': dj_database_url.parse(DATABASE_URL)
+}
 
 # ---------------------------
 # Security
 # ---------------------------
 SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,.fly.dev").split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,selamawit.pythonanywhere.com").split(",")
 
 # ---------------------------
 # Installed Apps
@@ -155,7 +135,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5500",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
-    "https://*.fly.dev",
+    "https://selamawit.pythonanywhere.com",
 ]
 
 # ---------------------------

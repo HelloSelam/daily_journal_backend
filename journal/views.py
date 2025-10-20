@@ -9,8 +9,17 @@ from rest_framework.response import Response
 from rest_framework import status
 
 def home(request):
-    return HttpResponse("Welcome to the Daily Journal App!")
-
+    return HttpResponse("""
+        <h1>Welcome to the Daily Journal API</h1>
+        <p>Here are some available endpoints you can explore:</p>
+        <ul>
+            <li><a href="/api/auth/registration/">/api/auth/registration/</a> — User registration</li>
+            <li><a href="/api/auth/login/">/api/auth/login/</a> — User login</li>
+            <li><a href="/api/auth/logout/">/api/auth/logout/</a> — User logout</li>
+            <li><a href="/api/entries/">/api/entries/</a> — Journal entries</li>
+        </ul>
+        <p>Built with ❤️ using Django REST Framework</p>
+    """)
 class JournalEntryViewSet(viewsets.ModelViewSet):
     serializer_class = JournalEntrySerializer
     permission_classes = [permissions.IsAuthenticated]
